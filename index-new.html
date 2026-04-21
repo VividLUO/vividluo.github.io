@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家校联合智慧教育平台 v4.0</title>
+    <link rel="stylesheet" href="style-new.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <meta name="description" content="基于AI的家校联合智慧教育平台，现代化界面设计，提升教学效率，增强家校协作">
+    <meta name="keywords" content="智慧教育,家校联合,教学管理,AI分析,现代化界面,大数据教育">
+</head>
+<body>
+    <!-- 现代化的登录页面 -->
+    <div id="loginPage" class="login-page">
+        <div class="login-container">
+            <div class="login-header">
+                <span class="material-icons">school</span>
+                <h1>家校联合智慧平台</h1>
+                <p>智慧教育 · 家校协同 · AI赋能</p>
+            </div>
+            
+            <!-- 标签页登录设计 -->
+            <div class="login-tabs">
+                <button class="login-tab active" onclick="switchTab('teacher-login')">
+                    <span class="material-icons">school</span>
+                    教师登录
+                </button>
+                <button class="login-tab" onclick="switchTab('parent-login')">
+                    <span class="material-icons">family_restroom</span>
+                    家长登录
+                </button>
+                <button class="login-tab" onclick="switchTab('admin-login')">
+                    <span class="material-icons">admin_panel_settings</span>
+                    管理员登录
+                </button>
+            </div>
+
+            <!-- 教师登录表单 -->
+            <div id="teacher-login" class="login-form active">
+                <div class="form-group">
+                    <label>
+                        <span class="material-icons">person</span>
+                        教师账号
+                    </label>
+                    <input type="text" placeholder="请输入教师账号" id="teacherUsername">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <span class="material-icons">lock</span>
+                        密码
+                    </label>
+                    <input type="password" placeholder="请输入密码" id="teacherPassword">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="loginTeacher()">
+                    <span class="material-icons">login</span>
+                    教师登录
+                </button>
+                <div class="demo-notes">
+                    <p style="margin-top: 20px; font-size: 0.9rem; color: #666;">
+                        <strong>演示账号：</strong> teacher / 123456 | <strong>管理员：</strong> admin / admin123
+                    </p>
+                </div>
+            </div>
+
+            <!-- 家长登录表单 -->
+            <div id="parent-login" class="login-form">
+                <div class="form-group">
+                    <label>
+                        <span class="material-icons">person</span>
+                        家长手机号
+                    </label>
+                    <input type="text" placeholder="请输入老师记录的手机号" id="parentUsername">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <span class="material-icons">lock</span>
+                        密码
+                    </label>
+                    <input type="password" placeholder="请输入密码（首次使用将自动注册）" id="parentPassword">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="loginParent()">
+                    <span class="material-icons">login</span>
+                    家长登录 / 注册
+                </button>
+                <div class="demo-notes">
+                    <p style="margin-top: 20px; font-size: 0.9rem; color: #666;">
+                        首次使用：输入老师记录的手机号和密码即可自动注册
+                    </p>
+                </div>
+            </div>
+
+            <!-- 管理员登录表单 -->
+            <div id="admin-login" class="login-form">
+                <div class="form-group">
+                    <label>
+                        <span class="material-icons">person</span>
+                        管理员账号
+                    </label>
+                    <input type="text" placeholder="请输入管理员账号" id="adminUsername">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <span class="material-icons">lock</span>
+                        密码
+                    </label>
+                    <input type="password" placeholder="请输入密码" id="adminPassword">
+                </div>
+                <button class="btn btn-primary btn-block" onclick="loginAdmin()">
+                    <span class="material-icons">admin_panel_settings</span>
+                    管理员登录
+                </button>
+            </div>
+
+            <!-- 快速测试登录（教学演示用） -->
+            <div class="demo-notes">
+                <h4>🔄 平台特色功能</h4>
+                <ul>
+                    <li>✅ AI驱动的学习分析报告生成</li>
+                    <li>✅ 标准化家校沟通模板</li>
+                    <li>✅ 多维度学生表现评价</li>
+                    <li>✅ 现代化响应式界面设计</li>
+                    <li>✅ 零服务器轻量化部署</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主应用容器 -->
+    <div id="appContainer" class="app-container hidden">
+        <!-- 头部区域 -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="material-icons">school</span>
+                    <h1>家校联合智慧平台</h1>
+                </div>
+                
+
+                
+                <!-- 用户信息 -->
+                <div class="user-info">
+                    <span class="material-icons">account_circle</span>
+                    <span id="currentUserName">欢迎您，张老师</span>
+                    <button class="btn-logout" onclick="logout()">
+                        <span class="material-icons">logout</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 教师工作台 -->
+        <div id="teacherPanel" class="main-panel active">
+            <!-- 学生管理标签页 -->
+            <!-- 横向功能栏已删除 -->
+
+            <!-- 学生管理标签页 -->
+            <div id="tab-students" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><span class="material-icons">group</span> 学生信息管理</h3>
+                        <div class="card-actions">
+                            <input type="text" placeholder="搜索学生姓名" class="search-input">
+                            <button class="btn btn-primary" onclick="addStudent()">
+                                <span class="material-icons">person_add</span>
+                                添加学生
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table" id="teacherStudentsTable">
+                            <thead>
+                                <tr>
+                                    <th>学号</th>
+                                    <th>姓名</th>
+                                    <th>年级</th>
+                                    <th>班级</th>
+                                    <th>家长联系方式</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsData">
+                                <!-- 学生数据将动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI分析报告标签页 -->
+            <div id="tab-reports" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><span class="material-icons">analytics</span> AI智慧分析报告</h3>
+                        <div class="card-actions">
+                            <select class="filter-select">
+                                <option>显示全部</option>
+                                <option>学习进度报告</option>
+                                <option>行为分析报告</option>
+                                <option>综合评估报告</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="aiReportsContainer">
+                            <!-- AI报告内容将通过JavaScript生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 作业管理标签页 -->
+            <div id="tab-homework" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><span class="material-icons">assignment</span> 作业发布与管理</h3>
+                        <div class="card-actions">
+                            <button class="btn btn-primary" onclick="createHomework()">
+                                <span class="material-icons">add</span>
+                                新建作业
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="homeworkList">
+                            <!-- 作业列表将通过JavaScript生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 考勤统计标签页 -->
+            <div id="tab-attendance" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><span class="material-icons">event_available</span> 学生考勤管理</h3>
+                        <div class="card-actions">
+                            <input type="date" id="attendanceDate" value="" class="date-picker">
+                            <button class="btn btn-primary" onclick="loadAttendanceData()">
+                                <span class="material-icons">search</span>
+                                查询
+                            </button>
+                            <button class="btn btn-success" onclick="recordTodayAttendance()">
+                                <span class="material-icons">assignment_ind</span>
+                                录入今日考勤
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- 考勤统计概览 -->
+                        <div class="attendance-stats">
+                            <div class="stat-card">
+                                <span class="material-icons">check_circle</span>
+                                <h3 id="presentRate">-</h3>
+                                <p>今日出勤率</p>
+                            </div>
+                            <div class="stat-card">
+                                <span class="material-icons">warning</span>
+                                <h3 id="absentCount">-</h3>
+                                <p>今日缺勤</p>
+                            </div>
+                            <div class="stat-card">
+                                <span class="material-icons">schedule</span>
+                                <h3 id="lateCount">-</h3>
+                                <p>今日迟到</p>
+                            </div>
+                            <div class="stat-card">
+                                <span class="material-icons">airline_seat_flat</span>
+                                <h3 id="leaveCount">-</h3>
+                                <p>今日请假</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 今日考勤录入区域 -->
+                        <div id="todayAttendanceSection" style="display: none;">
+                            <h4><span class="material-icons">edit_calendar</span> 今日考勤录入</h4>
+                            <div class="attendance-form">
+                                <div class="form-group">
+                                    <label>选择班级：</label>
+                                    <select id="attendanceClass" onchange="loadClassStudents()">
+                                        <option value="" disabled selected>请选择班级</option>
+                                        <option value="三年级一班">三年级一班</option>
+                                        <option value="三年级二班">三年级二班</option>
+                                        <option value="四年级一班">四年级一班</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="attendanceTableContainer" style="margin-top: 20px; display: none;">
+                                    <table class="data-table attendance-table">
+                                        <thead>
+                                            <tr>
+                                                <th>学号</th>
+                                                <th>姓名</th>
+                                                <th>考勤状态</th>
+                                                <th>备注</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="attendanceTableBody">
+                                            <!-- 考勤录入行将通过JavaScript动态生成 -->
+                                        </tbody>
+                                    </table>
+                                    <button class="btn btn-primary" onclick="submitAttendance()" style="margin-top: 15px;">
+                                        <span class="material-icons">save</span>
+                                        提交今日考勤
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 考勤记录查看 -->
+                        <div id="attendanceRecordsSection" style="margin-top: 30px;">
+                            <h4><span class="material-icons">history</span> 考勤记录查询</h4>
+                            <div id="attendanceRecords">
+                                <!-- 考勤记录将通过JavaScript动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 家长工作台 -->
+        <div id="parentPanel" class="main-panel">
+            <!-- 孩子概览标签页 -->
+            <!-- 横向功能栏已删除 -->
+            
+            <!-- 孩子概览标签页 -->
+            <div id="tab-child-overview" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><span class="material-icons">family_restroom</span> 孩子学习概览</h3>
+                        <p style="color: #666; margin: 0;">查看孩子的学习情况和成长轨迹</p>
+                    </div>
+                    <div class="card-body">
+                        <div id="parentContent">
+                            <p style="text-align: center; color: #999; padding: 40px;">
+                                <span class="material-icons" style="font-size: 3em; margin-bottom: 20px; display: block;">family_restroom</span>
+                                孩子概览功能正在开发中
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 成绩查看标签页 -->
+            <div id="tab-score-view" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><span class="material-icons">trending_up</span> 成绩查看</h3>
+                    </div>
+                    <div class="card-body">
+                        <p style="text-align: center; color: #999; padding: 40px;">
+                            成绩查看功能正在开发中
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 分析报告标签页 -->
+            <div id="tab-reports" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><span class="material-icons">description</span> 分析报告</h3>
+                    </div>
+                    <div class="card-body">
+                        <p style="text-align: center; color: #999; padding: 40px;">
+                            分析报告功能正在开发中
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 作业提交标签页 -->
+            <div id="tab-parent-homework" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><span class="material-icons">assignment</span> 作业提交</h3>
+                        <p style="color: #666; margin: 0;">查看和提交孩子的作业</p>
+                    </div>
+                    <div class="card-body">
+                        <!-- 作业列表将通过JavaScript动态生成 -->
+                        <div id="homework-submission-content">
+                            <p style="text-align: center; color: #999; padding: 20px;">
+                                加载作业信息中...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 管理工作台 -->
+        <div id="adminPanel" class="main-panel">
+            <!-- 系统概览标签页 -->
+            <!-- 横向功能栏已删除 -->
+            <div class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><span class="material-icons">admin_panel_settings</span> 系统管理台</h3>
+                        <p style="color: #666; margin: 0;">管理系统配置和用户数据</p>
+                    </div>
+                    <div class="card-body">
+                        <div id="adminContent">
+                            <p style="text-align: center; color: #999; padding: 40px;">
+                                <span class="material-icons" style="font-size: 3em; margin-bottom: 20px; display: block;">admin_panel_settings</span>
+                                管理员功能正在开发中
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载动画 -->
+    <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>正在加载数据，请稍候...</p>
+    </div>
+
+    <!-- 消息提示 -->
+    <div id="toast" class="toast" style="display: none;">
+        <span class="material-icons" id="toastIcon">check_circle</span>
+        <span class="toast-message" id="toastMessage">操作成功</span>
+    </div>
+
+    <!-- 现代化JavaScript -->
+    <script src="app-new.js"></script>
+</body>
+</html>
