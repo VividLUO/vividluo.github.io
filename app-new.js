@@ -534,15 +534,14 @@ function logout() {
 function addDemoTestData() {
     if (appData.parentAccounts.length === 0) {
         appData.parentAccounts = [
-            { id: 1, phone: '13800138001', password: '123456', name: '李小明家长', studentId: 'S001' },
-            { id: 2, phone: '13800138002', password: '123456', name: '张小红家长', studentId: 'S002' }
+            { id: 1, phone: '12345678910', password: '123456', name: '李小明家长', studentId: 'S001' }
         ];
     }
     
     if (appData.students.length === 0) {
         appData.students = [
-            { id: 1, studentId: 'S001', name: '李小明', grade: '三年级', class: '一班', parentContact: '13800138001' },
-            { id: 2, studentId: 'S002', name: '张小红', grade: '三年级', class: '一班', parentContact: '13800138002' }
+            { id: 1, studentId: 'S001', name: '李小明', grade: '三年级', class: '一班', parentContact: '12345678910' },
+            { id: 2, studentId: 'S002', name: '张小红', grade: '三年级', class: '一班', parentContact: '12345678910' }
         ];
     }
     
@@ -566,6 +565,38 @@ function addTestLoginButtons() {
                 </div>
             `;
             loginPage.querySelector('.login-container').appendChild(testButtons);
+            
+            // 为家长登录表单添加测试账号显示
+            const parentForm = document.getElementById('parent-login');
+            if (parentForm) {
+                const parentTestButtons = document.createElement('div');
+                parentTestButtons.className = 'test-buttons';
+                parentTestButtons.innerHTML = `
+                    <div style="margin-top: 20px; text-align: center; border-top: 1px solid #e0e0e0; padding-top: 20px;">
+                        <p style="color: #666; margin-bottom: 10px;">家长测试账号：</p>
+                        <p style="color: #888; font-size: 0.9rem; margin-bottom: 10px;">手机号：12345678910 密码：123456</p>
+                        <button onclick="document.getElementById('parentUsername').value='12345678910'; document.getElementById('parentPassword').value='123456'; loginParent();" 
+                                class="btn btn-sm" style="margin: 5px;">试用家长</button>
+                    </div>
+                `;
+                parentForm.appendChild(parentTestButtons);
+            }
+            
+            // 为管理员登录表单添加测试账号显示
+            const adminForm = document.getElementById('admin-login');
+            if (adminForm) {
+                const adminTestButtons = document.createElement('div');
+                adminTestButtons.className = 'test-buttons';
+                adminTestButtons.innerHTML = `
+                    <div style="margin-top: 20px; text-align: center; border-top: 1px solid #e0e0e0; padding-top: 20px;">
+                        <p style="color: #666; margin-bottom: 10px;">管理员测试账号：</p>
+                        <p style="color: #888; font-size: 0.9rem; margin-bottom: 10px;">账号：admin 密码：admin123</p>
+                        <button onclick="document.getElementById('adminUsername').value='admin'; document.getElementById('adminPassword').value='admin123'; loginAdmin();" 
+                                class="btn btn-sm" style="margin: 5px;">试用管理员</button>
+                    </div>
+                `;
+                adminForm.appendChild(adminTestButtons);
+            }
         }
     }
 }
@@ -1393,5 +1424,209 @@ function renderAttendanceView() {
     `;
 }
 
+// 家长查询考勤
+function queryParentAttendance() {
+    if (!currentUser || !currentUser.studentId) {
+        showToast('未找到学生信息', 'error');
+        return;
+    }
+    
+    const records = appData.attendance.filter(a => a.studentId === currentUser.studentId);
+    
+    let html = `
+        <div class="modal-overlay active" id="parentAttendanceModal">
+            <div class="modal-content" style="max-width: 700px;">
+                <div class="modal-header">
+                    <h3><span class="material-icons">calendar_today</span> 考勤查询</h3>
+                    <button class="modal-close" onclick="closeModal('parentAttendanceModal')">×</button>
+                </div>
+                <div class="modal-body">
+    `;
+    
+    if (records.length === 0) {
+        html += '<p style="text-align: center; color: #999;">暂无考勤记录</p>';
+    } else {
+        const presentCount = records.filter(r => r.status === 'present').length;
+        const absentCount = records.filter(r => r.status === 'absent').length;
+        const lateCount = records.filter(r => r.status === 'late').length;
+        const leaveCount = records.filter(r => r.status === 'leave').length;
+        
+        html += `
+            <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
+                <div style="text-align: center; padding: 10px; background: #e8f5e9; border-radius: 8px;">
+                    <div style="font-size: 24px; font-weight: bold; color: #2e7d32;">${presentCount}</div>
+                    <div style="font-size: 12px; color: #666;">正常</div>
+                </div>
+                <div style="text-align: center; padding: 10px; background: #ffebee; border-radius: 8px;">
+                    <div style="font-size: 24px; font-weight: bold; color: #c62828;">${absentCount}</div>
+                    <div style="font-size: 12px; color: #666;">缺勤</div>
+                </div>
+                <div style="text-align: center; padding: 10px; background: #fff3e0; border-radius: 8px;">
+                    <div style="font-size: 24px; font-weight: bold; color: #ef6c00;">${lateCount}</div>
+                    <div style="font-size: 12px; color: #666;">迟到</div>
+                </div>
+                <div style="text-align: center; padding: 10px; background: #e3f2fd; border-radius: 8px;">
+                    <div style="font-size: 24px; font-weight: bold; color: #1565c0;">${leaveCount}</div>
+                    <div style="font-size: 12px; color: #666;">请假</div>
+                </div>
+            </div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>状态</th>
+                        <th>备注</th>
+                        <th>记录人</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        records.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        records.forEach(record => {
+            const statusText = {
+                'present': '正常',
+                'absent': '缺勤',
+                'late': '迟到',
+                'leave': '请假'
+            }[record.status] || record.status;
+            
+            const statusColor = {
+                'present': '#4caf50',
+                'absent': '#f44336',
+                'late': '#ff9800',
+                'leave': '#2196f3'
+            }[record.status] || '#666';
+            
+            html += `
+                <tr>
+                    <td>${record.date}</td>
+                    <td><span style="color: ${statusColor}; font-weight: bold;">${statusText}</span></td>
+                    <td>${record.remark || '-'}</td>
+                    <td>${record.recordedBy || '-'}</td>
+                </tr>
+            `;
+        });
+        
+        html += '</tbody></table>';
+    }
+    
+    html += `
+                </div>
+                <div class="modal-footer">
+                    <button class="modern-btn secondary" onclick="closeModal('parentAttendanceModal')">关闭</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', html);
+}
+
 // 初始化测试按钮
 addTestLoginButtons();
+
+// ==================== 课堂管理功能 ====================
+
+// 打开课堂管理页面
+function openClassroomPage() {
+    window.open('classroom.html', '_blank');
+}
+
+// 快速抽学号功能
+function quickLottery() {
+    const classSelect = document.getElementById('quick-lottery-class');
+    const selectedClass = classSelect.value;
+    
+    if (!selectedClass) {
+        showToast('请选择班级', 'error');
+        return;
+    }
+    
+    // 获取该班级的学生列表
+    const students = appData.students.filter(s => s.class === selectedClass || s.className === selectedClass);
+    
+    if (students.length === 0) {
+        showToast('该班级暂无学生', 'warning');
+        return;
+    }
+    
+    // 随机选择一个学生
+    const randomIndex = Math.floor(Math.random() * students.length);
+    const selectedStudent = students[randomIndex];
+    
+    // 显示抽中结果
+    const resultDiv = document.getElementById('quick-lottery-result');
+    const studentIdElement = document.getElementById('lottery-student-id');
+    const studentNameElement = document.getElementById('lottery-student-name');
+    
+    if (resultDiv) resultDiv.style.display = 'block';
+    if (studentIdElement) studentIdElement.textContent = selectedStudent.studentId || selectedStudent.id;
+    if (studentNameElement) studentNameElement.textContent = selectedStudent.name;
+    
+    showToast(`🎉 抽中：${selectedStudent.name}`, 'success');
+    
+    // 记录抽奖历史
+    addLotteryRecord(selectedClass, selectedStudent);
+}
+
+// 添加抽奖记录
+function addLotteryRecord(className, student) {
+    if (!appData.lotteryHistory) {
+        appData.lotteryHistory = [];
+    }
+    
+    appData.lotteryHistory.push({
+        id: 'L' + Date.now(),
+        className: className,
+        studentId: student.studentId || student.id,
+        studentName: student.name,
+        timestamp: new Date().toLocaleString('zh-CN'),
+        date: new Date().toISOString().split('T')[0]
+    });
+    
+    saveAppData();
+}
+
+// 清空抽奖历史
+function clearLotteryHistory() {
+    if (confirm('确定要清空抽学号历史记录吗？')) {
+        appData.lotteryHistory = [];
+        saveAppData();
+        showToast('历史记录已清空', 'success');
+    }
+}
+
+// 加载课堂管理统计数据
+function loadClassroomStats() {
+    // 模拟统计数据
+    const snapshots = appData.snapshots ? appData.snapshots.length : 0;
+    const videos = appData.videos ? appData.videos.length : 0;
+    const classes = appData.classes ? appData.classes.length : 3;
+    const records = appData.classroomRecords ? appData.classroomRecords.length : 0;
+    
+    const snapshotsElement = document.getElementById('classroom-snapshots');
+    const videosElement = document.getElementById('classroom-videos');
+    const classesElement = document.getElementById('classroom-classes');
+    const recordsElement = document.getElementById('classroom-records');
+    
+    if (snapshotsElement) snapshotsElement.textContent = snapshots || '0';
+    if (videosElement) videosElement.textContent = videos || '0';
+    if (classesElement) classesElement.textContent = classes || '3';
+    if (recordsElement) recordsElement.textContent = records || '0';
+}
+
+// 标签页切换时加载对应数据
+document.addEventListener('DOMContentLoaded', function() {
+    // 监听标签页切换
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabId = this.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+            if (tabId === 'classroom') {
+                setTimeout(loadClassroomStats, 100);
+            }
+        });
+    });
+});
